@@ -35,6 +35,9 @@ function Index() {
   const [step, setStep] = useState(0);
   const [insights, setInsights] = useState<string[]>([]);
   const [solution, setSolution] = useState("");
+  const [feedback, setFeedback] = useState<Record<string, "up" | "down">>({});
+  const rate = (role: string, v: "up" | "down") =>
+    setFeedback((f) => { const n = { ...f }; if (n[role] === v) delete n[role]; else n[role] = v; return n; });
 
   const toggleRole = (id: string) => {
     setRoles((r) => (r.includes(id) ? r.filter((x) => x !== id) : r.length >= MAX_ROLES ? r : [...r, id]));
@@ -46,14 +49,20 @@ function Index() {
     setError(null);
     setLoading(true);
     try {
-      const res = await gen({ data: { problem, roles } });
-      if (!res.ok) return setError(res.error);
+      let res: Awaited<ReturnType<typeof gen>> | null = null;
+      // One automatic retry if the connection drops.
+      for (let attempt = 0; attempt < 2 && !res; attempt++) {
+        try { res = await gen({ data: { problem, roles } }); }
+        catch (e) { if (attempt === 1) throw e; await new Promise((r) => setTimeout(r, 1000)); }
+      }
+      if (!res || !res.ok) return setError(res ? res.error : "Something went wrong.");
       setResult(res.result);
       setStep(0);
       setInsights([]);
       setSolution("");
+      setFeedback({});
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError("Connection problem. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -121,7 +130,14 @@ function Index() {
               })}
             </div>
 
-            {error && <p role="alert" className="mt-4 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">{error}</p>}
+            {error && (
+              <div role="alert" className="mt-4 flex items-center justify-between gap-3 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                <span>{error}</span>
+                {validateInput(problem, roles) === null && (
+                  <Button variant="outline" size="sm" onClick={submit} disabled={loading}>{loading ? "Retrying…" : "Retry"}</Button>
+                )}
+              </div>
+            )}
 
             <Button size="lg" className="mt-6 w-full" onClick={submit} disabled={loading}>
               {loading ? "Generating perspectives…" : "Generate Perspectives"}
@@ -153,6 +169,17 @@ function Index() {
                       <div key={k}><dt className="font-semibold text-foreground">{k}</dt><dd className="text-muted-foreground">{v}</dd></div>
                     ))}
                   </dl>
+                  <div className="mt-4 flex items-center gap-2 border-t pt-3 text-xs text-muted-foreground">
+                    <span>Was this helpful?</span>
+                    {(["up", "down"] as const).map((v) => (
+                      <button key={v} type="button" aria-pressed={feedback[p.role] === v} aria-label={v === "up" ? "Helpful" : "Not helpful"}
+                        onClick={() => rate(p.role, v)}
+                        className={`rounded-full border px-3 py-1 transition ${feedback[p.role] === v ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}>
+                        {v === "up" ? "👍" : "👎"}
+                      </button>
+                    ))}
+                    {feedback[p.role] && <span>Thanks!</span>}
+                  </div>
                 </article>
               ))}
             </div>
@@ -210,7 +237,7 @@ function Index() {
             <div className="space-y-4 rounded-2xl border bg-card p-8 shadow-soft">
               <h2 className="text-3xl font-bold text-foreground">Reflection summary</h2>
               <Block title="Original problem"><p>{problem}</p></Block>
-              <Block title="Perspectives explored"><p>{result.perspectives.map((p) => p.role).join(", ")}</p></Block>
+              <Block title="Perspectives explored"><p>{result.perspectives.map((p) => p.role + (feedback[p.role] ? (feedback[p.role] === "up" ? " 👍" : " 👎") : "")).join(", ")}</p></Block>
               <Block title="Selected insights">
                 {insights.length ? <ul className="list-disc pl-5">{insights.map((i) => <li key={i}>{i}</li>)}</ul> : <p>None selected.</p>}
               </Block>
