@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- Input rules (lengths, role counts) live in src/lib/perspectives.ts and are enforced both in the UI and the server function, so they can never drift apart.
+- AI calls run only in src/lib/perspectives.functions.ts via the Lovable AI Gateway SDK with a strict JSON schema, keeping the key server-side.
