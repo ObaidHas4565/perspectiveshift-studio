@@ -14,6 +14,7 @@ A user describes a situation, selects the people whose perspectives they would l
 
 1. **Describe the problem.** Enter between 20 and 1,000 characters, excluding leading and trailing spaces.
 2. **Choose perspectives.** Select two to four of the six available roles: Student, Employer, University / Educator, Industry Professional, Customer / End User, and AI / Technology Specialist.
+   Before submission, the browser masks some recognisable sensitive details. If anything changes, the text that will be sent appears below the form for review. A reminder asks users to use made-up details and remove confidential information.
 3. **Review the perspectives.** Each role receives a card covering priorities, concerns, opportunities, and a suggested action. Thumbs-up and thumbs-down buttons let the user mark whether a card was helpful.
 4. **Compare and question.** The app presents similarities, differences, and three questions intended to challenge the user's assumptions.
 5. **Build a solution.** The user selects useful insights, optionally adds them to a draft, and writes their own solution.
@@ -27,6 +28,7 @@ The current model is **Google Gemini 3.1 Flash Lite** (`google/gemini-3.1-flash-
 
 ```text
 Problem and selected roles
+    → Browser-side masking of problem text
     → Server-side input checks
     → Prompt and required JSON structure
     → Gemini 3.1 Flash Lite through Lovable AI Gateway
@@ -89,6 +91,7 @@ The same script names can be used with `npm run`.
 | `src/routes/__root.tsx` | Shared page structure, fonts, stylesheet, query provider, and missing-page and error displays. |
 | `src/routes/README.md` | Notes on the project's file-based routing conventions. |
 | `src/lib/perspectives.ts` | Role names and focus areas, shared input limits, input validation, and result types. |
+| `src/lib/privacy.ts` | Browser-side pattern matching that replaces some sensitive details before submission or retry. |
 | `src/lib/perspectives.functions.ts` | Server-side validation, prompt, JSON schema, Gemini request, response handling, and AI error messages. |
 | `src/router.tsx` | Creates the router and a separate query client for each server request. |
 | `src/routeTree.gen.ts` | Generated route list; maintained by the routing tools rather than edited manually. |
@@ -127,6 +130,7 @@ The same script names can be used with `npm run`.
 | File | Purpose |
 | --- | --- |
 | `src/test/perspectives.test.ts` | Tests the problem-length and perspective-count rules. |
+| `src/test/privacy.test.ts` | Checks masking of email addresses, common phone formats, labelled IDs, listed visa terms, and common institution names, as well as unchanged context. |
 | `src/test/perspectives.functions.test.ts` | Checks the Gemini model selection and response mapping using a mocked model call, without spending AI credits. |
 | `src/test/app-routing.test.tsx` | Checks that the home address matches an application page. |
 | `src/test/setup.ts` | Shared browser test setup. |
@@ -155,12 +159,18 @@ The same script names can be used with `npm run`.
 
 Folders such as `node_modules`, `dist`, and `.output` are installed dependencies or generated output, rather than application source. Git metadata records repository history and is not part of the application.
 
-## Limitations and privacy
+## Privacy and data handling
+
+- **Browser-side masking.** Before every generation request, including retries, the browser replaces detected details with labels such as `[EMAIL]` and `[INSTITUTION]`. This uses local pattern matching, with no additional AI calls, subscriptions, or per-use masking charges. AI generation still uses Gateway credits.
+- **Coverage is limited.** The filter covers email addresses, some common phone formats, labelled passport/student/national IDs, listed visa terms (F-1, J-1, H-1B, Tier 2/4, Golden Visa, and student visa), and some capitalised full university, college, or institute names. It can miss other formats, abbreviations, names, addresses, and sensitive details. It may also mask text unnecessarily. It does not reliably detect personal issues, health details, or identifying combinations of facts.
+- **Review before sending.** When masking changes the problem, the form shows the text that will be sent. Users can edit the original description to remove anything else. Masking reduces exposure; it does not guarantee anonymity or confidentiality.
+- **AI requests still leave the browser.** The masked problem and selected roles are sent to the server and AI service. The original problem is not included in that application request, but any sensitive details the filter misses remain in the sent text. Hosting and AI-service logging and retention are separate from the app's own storage.
+- **Nothing is saved by the application.** The original problem, results, ratings, selected insights, and draft stay in page memory. The original problem remains visible in the form and reflection summary on that device; refreshing or closing the page clears the session. There is no application database or saved session.
+- **Feedback is temporary.** Card ratings appear in the reflection summary, but are not collected centrally or used to train the model.
+
+## Limitations
 
 - **Results are suggestions.** The model can be wrong or oversimplify a group's perspective. The prompt discourages invented facts, but it cannot guarantee accuracy. Important claims still need checking.
-- **Nothing is saved by the application.** Inputs, results, ratings, selected insights, and the draft stay in React state for the current page session. Refreshing or closing the page clears them. There are no accounts, database records, saved sessions, or downloadable reports.
-- **AI requests leave the browser.** The problem and selected roles are sent to the server and AI service. The absence of a database does not mean the app runs privately or offline. Avoid entering confidential or sensitive personal information; service logging and retention are separate from the app's own storage.
-- **Feedback is temporary.** Card ratings appear in the reflection summary, but are not collected centrally or used to train the model.
 - **Gemini is not unlimited or inherently free here.** Requests use Lovable AI Gateway credits and require available workspace allowance or balance. This implementation does not use Google AI Studio's free tier or a daily-reset token quota. Selecting a lighter model does not restore exhausted credits.
 - **Response time varies.** Generation requires an internet connection and depends on service availability and request length. No fixed latency or uptime guarantee has been established for this prototype.
 - **Retry is limited.** The interface retains one automatic retry after a thrown connection error and a manual Retry button for valid submissions that fail. It does not switch to a fallback model. A lost response can leave a request's outcome uncertain, so retrying can result in another billed request.
