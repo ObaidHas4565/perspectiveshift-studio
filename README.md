@@ -14,6 +14,7 @@ A user describes a situation, selects the people whose perspectives they would l
 
 1. **Describe the problem.** Enter between 20 and 1,000 characters, excluding leading and trailing spaces.
 2. **Choose perspectives.** Select two to four of the six available roles: Student, Employer, University / Educator, Industry Professional, Customer / End User, and AI / Technology Specialist.
+   Before submission, the browser masks some recognisable sensitive details. If anything changes, the text that will be sent appears below the form for review. A reminder asks users to use made-up details and remove confidential information.
 3. **Review the perspectives.** Each role receives a card covering priorities, concerns, opportunities, and a suggested action. Thumbs-up and thumbs-down buttons let the user mark whether a card was helpful.
 4. **Compare and question.** The app presents similarities, differences, and three questions intended to challenge the user's assumptions.
 5. **Build a solution.** The user selects useful insights, optionally adds them to a draft, and writes their own solution.
@@ -27,6 +28,7 @@ The current model is **Google Gemini 3.1 Flash Lite** (`google/gemini-3.1-flash-
 
 ```text
 Problem and selected roles
+    → Browser-side masking of problem text
     → Server-side input checks
     → Prompt and required JSON structure
     → Gemini 3.1 Flash Lite through Lovable AI Gateway
@@ -89,6 +91,7 @@ The same script names can be used with `npm run`.
 | `src/routes/__root.tsx` | Shared page structure, fonts, stylesheet, query provider, and missing-page and error displays. |
 | `src/routes/README.md` | Notes on the project's file-based routing conventions. |
 | `src/lib/perspectives.ts` | Role names and focus areas, shared input limits, input validation, and result types. |
+| `src/lib/privacy.ts` | Browser-side pattern matching that replaces some sensitive details before submission or retry. |
 | `src/lib/perspectives.functions.ts` | Server-side validation, prompt, JSON schema, Gemini request, response handling, and AI error messages. |
 | `src/router.tsx` | Creates the router and a separate query client for each server request. |
 | `src/routeTree.gen.ts` | Generated route list; maintained by the routing tools rather than edited manually. |
@@ -127,6 +130,7 @@ The same script names can be used with `npm run`.
 | File | Purpose |
 | --- | --- |
 | `src/test/perspectives.test.ts` | Tests the problem-length and perspective-count rules. |
+| `src/test/privacy.test.ts` | Checks masking of email addresses, common phone formats, labelled IDs, listed visa terms, and common institution names, as well as unchanged context. |
 | `src/test/perspectives.functions.test.ts` | Checks the Gemini model selection and response mapping using a mocked model call, without spending AI credits. |
 | `src/test/app-routing.test.tsx` | Checks that the home address matches an application page. |
 | `src/test/setup.ts` | Shared browser test setup. |

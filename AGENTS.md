@@ -32,3 +32,4 @@ use the editor.
 ## Project rules
 - Input rules (lengths, role counts) live in src/lib/perspectives.ts and are enforced both in the UI and the server function, so they can never drift apart.
 - AI calls run only in src/lib/perspectives.functions.ts via the Lovable AI Gateway SDK with a strict JSON schema, keeping the key server-side.
+- Mask problem text in the browser with src/lib/privacy.ts before every generation or retry; keep originals in page state only, so detected identifiers never enter the application request.
