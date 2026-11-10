@@ -157,19 +157,22 @@ Folders such as `node_modules`, `dist`, and `.output` are installed dependencies
 
 ## Privacy and data handling
 
-- **Nothing is saved by the application:** Inputs, results, ratings, selected insights, and the draft stay in browser memory for the current session. Refreshing or closing the tab clears them. There are no accounts, database records, saved sessions, or downloadable reports.
-- **AI requests leave the browser:** Problem text and selected roles are transmitted to the server function and the AI service. The lack of a database does not mean the app operates offline or fully privately. Avoid entering confidential or sensitive personal information.
-- **Feedback is temporary:** Thumbs-up and thumbs-down ratings appear in the reflection summary, but are not recorded to a server, collected centrally, or used to train the model. 
+- **Browser-side masking.** Before every generation request, including retries, the browser replaces detected details with labels such as `[EMAIL]` and `[INSTITUTION]`. This uses local pattern matching, with no additional AI calls, subscriptions, or per-use masking charges. AI generation still uses Gateway credits.
+- **Coverage is limited.** The filter covers email addresses, some common phone formats, labelled passport/student/national IDs, listed visa terms (F-1, J-1, H-1B, Tier 2/4, Golden Visa, and student visa), and some capitalised full university, college, or institute names. It can miss other formats, abbreviations, names, addresses, and sensitive details. It may also mask text unnecessarily. It does not reliably detect personal issues, health details, or identifying combinations of facts.
+- **Review before sending.** When masking changes the problem, the form shows the text that will be sent. Users can edit the original description to remove anything else. Masking reduces exposure; it does not guarantee anonymity or confidentiality.
+- **AI requests still leave the browser.** The masked problem and selected roles are sent to the server and AI service. The original problem is not included in that application request, but any sensitive details the filter misses remain in the sent text. Hosting and AI-service logging and retention are separate from the app's own storage.
+- **Nothing is saved by the application.** The original problem, results, ratings, selected insights, and draft stay in page memory. The original problem remains visible in the form and reflection summary on that device; refreshing or closing the page clears the session. There is no application database or saved session.
+- **Feedback is temporary.** Card ratings appear in the reflection summary, but are not collected centrally or used to train the model.
 
+## Limitations
 
-## Limitations and privacy
+- **Results are suggestions.** The model can be wrong or oversimplify a group's perspective. The prompt discourages invented facts, but it cannot guarantee accuracy. Important claims still need checking.
+- **Gemini is not unlimited or inherently free here.** Requests use Lovable AI Gateway credits and require available workspace allowance or balance. This implementation does not use Google AI Studio's free tier or a daily-reset token quota. Selecting a lighter model does not restore exhausted credits.
+- **Response time varies.** Generation requires an internet connection and depends on service availability and request length. No fixed latency or uptime guarantee has been established for this prototype.
+- **Retry is limited.** The interface retains one automatic retry after a thrown connection error and a manual Retry button for valid submissions that fail. It does not switch to a fallback model. A lost response can leave a request's outcome uncertain, so retrying can result in another billed request.
+- **The workflow has fixed limits.** It accepts text only, with six predefined roles and two to four selections. It does not accept uploaded documents, custom roles, or follow-up conversations.
+- **A production deployment needs further review.** The app has no user accounts or application-level per-user spending limits. Automated tests cover specific behaviours, not every possible model answer, security risk, or hosting condition.
 
-- **Results and suggestions:** The model can be mistaken or oversimplify a group’s viewpoint. The prompt discourages invented facts, but cannot guarantee accuracy. Important claims require independent verification.
-- **Usage uses monthly credits:** Requests use Lovable AI Gateway credits and require available workspace allowance. This implementation does not use an external daily-reset quota.
-- **Response time varies:** Generating perspectives requires an active internet connection and depends on third-party service availability and text length. No fixed latency or uptime guarantee is provided.
-- **Retry behaviour is limited:**  The interface includes one automatic retry for dropped connections and a manual Retry button, but it does not switch to a fallback model.
-- **The workflow has a fixed scope:**  It accepts plain text only (20–1,000 characters) across six predefined roles (selecting 2–4). It does not support file attachments, custom roles, or conversational follow-up questions.
-- **Prototype Status:** The application does not include user accounts, authentication, or per-user spending limits, and has not been evaluated for production security or compliance requirements.
 
 ## Working with GitHub and VS Code
 
