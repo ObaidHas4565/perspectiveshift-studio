@@ -155,17 +155,21 @@ The same script names can be used with `npm run`.
 
 Folders such as `node_modules`, `dist`, and `.output` are installed dependencies or generated output, rather than application source. Git metadata records repository history and is not part of the application.
 
+## Privacy and data handling
+
+- **Nothing is saved by the application:** Inputs, results, ratings, selected insights, and the draft stay in browser memory for the current session. Refreshing or closing the tab clears them. There are no accounts, database records, saved sessions, or downloadable reports.
+- **AI requests leave the browser:** Problem text and selected roles are transmitted to the server function and the AI service. The lack of a database does not mean the app operates offline or fully privately. Avoid entering confidential or sensitive personal information.
+- **Feedback is temporary:** Thumbs-up and thumbs-down ratings appear in the reflection summary, but are not recorded to a server, collected centrally, or used to train the model. 
+
+
 ## Limitations and privacy
 
-- **Results are suggestions.** The model can be wrong or oversimplify a group's perspective. The prompt discourages invented facts, but it cannot guarantee accuracy. Important claims still need checking.
-- **Nothing is saved by the application.** Inputs, results, ratings, selected insights, and the draft stay in React state for the current page session. Refreshing or closing the page clears them. There are no accounts, database records, saved sessions, or downloadable reports.
-- **AI requests leave the browser.** The problem and selected roles are sent to the server and AI service. The absence of a database does not mean the app runs privately or offline. Avoid entering confidential or sensitive personal information; service logging and retention are separate from the app's own storage.
-- **Feedback is temporary.** Card ratings appear in the reflection summary, but are not collected centrally or used to train the model.
-- **Gemini is not unlimited or inherently free here.** Requests use Lovable AI Gateway credits and require available workspace allowance or balance. This implementation does not use Google AI Studio's free tier or a daily-reset token quota. Selecting a lighter model does not restore exhausted credits.
-- **Response time varies.** Generation requires an internet connection and depends on service availability and request length. No fixed latency or uptime guarantee has been established for this prototype.
-- **Retry is limited.** The interface retains one automatic retry after a thrown connection error and a manual Retry button for valid submissions that fail. It does not switch to a fallback model. A lost response can leave a request's outcome uncertain, so retrying can result in another billed request.
-- **The workflow has fixed limits.** It accepts text only, with six predefined roles and two to four selections. It does not accept uploaded documents, custom roles, or follow-up conversations.
-- **A production deployment needs further review.** The app has no user accounts or application-level per-user spending limits. Automated tests cover specific behaviours, not every possible model answer, security risk, or hosting condition.
+- **Results and suggestions:** The model can be mistaken or oversimplify a group’s viewpoint. The prompt discourages invented facts, but cannot guarantee accuracy. Important claims require independent verification.
+- **Usage uses monthly credits:** Requests use Lovable AI Gateway credits and require available workspace allowance. This implementation does not use an external daily-reset quota.
+- **Response time varies:** Generating perspectives requires an active internet connection and depends on third-party service availability and text length. No fixed latency or uptime guarantee is provided.
+- **Retry behaviour is limited:**  The interface includes one automatic retry for dropped connections and a manual Retry button, but it does not switch to a fallback model.
+- **The workflow has a fixed scope:**  It accepts plain text only (20–1,000 characters) across six predefined roles (selecting 2–4). It does not support file attachments, custom roles, or conversational follow-up questions.
+- **Prototype Status:** The application does not include user accounts, authentication, or per-user spending limits, and has not been evaluated for production security or compliance requirements.
 
 ## Working with GitHub and VS Code
 
