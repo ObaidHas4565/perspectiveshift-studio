@@ -7,6 +7,7 @@ import {
   ROLES, MAX_ROLES, MIN_ROLES, PROBLEM_MAX, validateInput, type Analysis,
 } from "@/lib/perspectives";
 import { generatePerspectives } from "@/lib/perspectives.functions";
+import { maskSensitiveText } from "@/lib/privacy";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,6 +37,8 @@ function Index() {
   const [insights, setInsights] = useState<string[]>([]);
   const [solution, setSolution] = useState("");
   const [feedback, setFeedback] = useState<Record<string, "up" | "down">>({});
+  const maskedProblem = maskSensitiveText(problem);
+  const hasMaskedDetails = maskedProblem !== problem;
   const rate = (role: string, v: "up" | "down") =>
     setFeedback((f) => { const n = { ...f }; if (n[role] === v) delete n[role]; else n[role] = v; return n; });
 
@@ -46,13 +49,15 @@ function Index() {
   const submit = async () => {
     const v = validateInput(problem, roles);
     if (v) return setError(v);
+    const maskedError = validateInput(maskedProblem, roles);
+    if (maskedError) return setError(`After privacy masking: ${maskedError}`);
     setError(null);
     setLoading(true);
     try {
       let res: Awaited<ReturnType<typeof gen>> | null = null;
       // One automatic retry if the connection drops.
       for (let attempt = 0; attempt < 2 && !res; attempt++) {
-        try { res = await gen({ data: { problem, roles } }); }
+        try { res = await gen({ data: { problem: maskedProblem, roles } }); }
         catch (e) { if (attempt === 1) throw e; await new Promise((r) => setTimeout(r, 1000)); }
       }
       if (!res || !res.ok) return setError(res ? res.error : "Something went wrong.");
@@ -139,7 +144,17 @@ function Index() {
               </div>
             )}
 
-            <Button size="lg" className="mt-6 w-full" onClick={submit} disabled={loading}>
+            <p className="mt-6 text-sm text-muted-foreground">
+              Use made-up details, not real names or confidential information. Automatic masking can miss details, including personal issues.
+            </p>
+            {hasMaskedDetails && (
+              <div className="mt-3 border-l-2 border-primary pl-3">
+                <p className="text-sm font-semibold text-foreground">Text sent for analysis</p>
+                <p className="mt-1 whitespace-pre-wrap break-words text-sm text-muted-foreground" aria-live="polite">{maskedProblem}</p>
+                <p className="mt-2 text-xs text-muted-foreground">Review this text and remove anything else you want to keep private.</p>
+              </div>
+            )}
+            <Button size="lg" className="mt-4 w-full" onClick={submit} disabled={loading}>
               {loading ? "Generating perspectives…" : "Generate Perspectives"}
             </Button>
           </div>
