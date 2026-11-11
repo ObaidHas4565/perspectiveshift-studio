@@ -6,7 +6,7 @@ A user describes a situation, selects the people whose perspectives they would l
 
 ## Access
 
-- [Open the development preview](https://id-preview--cc497cd7-4c52-4bb7-84e2-0a76898bbad7.lovable.app). Access may depend on the project's preview settings.
+- [Open the development preview](https://perspective-shift-playground.lovable.app/). Access may depend on the project's preview settings.
 - A published application link has not yet been added to this README.
 - The project can also be opened in VS Code and run locally using the instructions below.
 
