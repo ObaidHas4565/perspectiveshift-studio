@@ -4,9 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  ROLES, MAX_ROLES, MIN_ROLES, PROBLEM_MAX, validateInput, type Analysis,
+  ROLES, MAX_ROLES, MIN_ROLES, PROBLEM_MAX, CUSTOM_PREFIX, CUSTOM_ROLE_MAX, MAX_INSIGHTS,
+  resolveRole, validateInput, type Analysis,
 } from "@/lib/perspectives";
-import { generatePerspectives } from "@/lib/perspectives.functions";
+import { generatePerspectives, synthesizeSolution } from "@/lib/perspectives.functions";
 import { maskSensitiveText } from "@/lib/privacy";
 
 export const Route = createFileRoute("/")({
@@ -28,6 +29,10 @@ const STEPS = ["Perspectives", "Compare", "Challenge", "Build", "Reflect"];
 
 function Index() {
   const gen = useServerFn(generatePerspectives);
+  const synth = useServerFn(synthesizeSolution);
+  const [customRole, setCustomRole] = useState("");
+  const [drafting, setDrafting] = useState(false);
+  const [draftError, setDraftError] = useState<string | null>(null);
   const [problem, setProblem] = useState("");
   const [roles, setRoles] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +75,32 @@ function Index() {
       setError("Connection problem. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const addCustomRole = () => {
+    const label = maskSensitiveText(customRole.trim().replace(/\s+/g, " "));
+    if (!label) return;
+    const id = CUSTOM_PREFIX + label;
+    if (!resolveRole(id)) return setError("Custom perspectives must be 3–40 characters.");
+    if (roles.some((x) => resolveRole(x)?.label.toLowerCase() === label.toLowerCase())) return setError("That perspective is already selected.");
+    if (roles.length >= MAX_ROLES) return setError(`Select no more than ${MAX_ROLES} perspectives.`);
+    setError(null);
+    setRoles((r) => [...r, id]);
+    setCustomRole("");
+  };
+
+  const draftSolution = async () => {
+    setDrafting(true);
+    setDraftError(null);
+    try {
+      const res = await synth({ data: { problem: maskedProblem, insights: insights.slice(0, MAX_INSIGHTS), notes: maskSensitiveText(solution) } });
+      if (!res.ok) return setDraftError(res.error);
+      setSolution(res.solution);
+    } catch {
+      setDraftError("Connection problem. Please try again.");
+    } finally {
+      setDrafting(false);
     }
   };
 
@@ -133,6 +164,24 @@ function Index() {
                   </button>
                 );
               })}
+              {roles.filter((id) => id.startsWith(CUSTOM_PREFIX)).map((id) => (
+                <button key={id} type="button" aria-pressed onClick={() => toggleRole(id)}
+                  className="rounded-xl border border-primary bg-primary px-4 py-3 text-left text-sm font-medium text-primary-foreground">
+                  {resolveRole(id)?.label} <span aria-hidden>×</span>
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 flex gap-2">
+              <input
+                value={customRole}
+                maxLength={CUSTOM_ROLE_MAX}
+                onChange={(e) => setCustomRole(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomRole(); } }}
+                placeholder="Or type your own, e.g. Nurse, Landlord, Startup Founder"
+                aria-label="Custom perspective"
+                className="flex-1 rounded-xl border bg-background px-4 py-2 text-sm text-foreground"
+              />
+              <Button type="button" variant="outline" onClick={addCustomRole} disabled={!customRole.trim() || roles.length >= MAX_ROLES}>Add</Button>
             </div>
 
             {error && (
@@ -237,11 +286,13 @@ function Index() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Your solution</h2>
-                <p className="mt-1 text-sm text-muted-foreground">You decide. Combine your chosen insights in your own words.</p>
-                <Button variant="outline" size="sm" className="mt-3" disabled={!insights.length}
-                  onClick={() => setSolution((s) => (s ? s + "\n" : "") + insights.map((i) => "• " + i).join("\n"))}>
-                  Add selected insights to draft
+                <p className="mt-1 text-sm text-muted-foreground">Optionally jot your own thoughts below, then let the AI weave your selected insights into one plan. Edit it until it's yours.</p>
+                <Button variant="outline" size="sm" className="mt-3" disabled={!insights.length || drafting}
+                  onClick={draftSolution}>
+                  {drafting ? "Drafting…" : solution.trim() ? "Redraft using my notes + insights" : "Draft a solution from my insights"}
                 </Button>
+                {insights.length > MAX_INSIGHTS && <p className="mt-2 text-xs text-muted-foreground">Only the first {MAX_INSIGHTS} insights will be used.</p>}
+                {draftError && <p role="alert" className="mt-2 text-sm text-destructive">{draftError}</p>}
                 <Textarea value={solution} onChange={(e) => setSolution(e.target.value)} className="mt-3 min-h-64" placeholder="Write your final solution…" />
                 <Button className="mt-3 w-full" disabled={!solution.trim()} onClick={() => setStep(4)}>See reflection summary</Button>
               </div>

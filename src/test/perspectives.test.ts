@@ -10,3 +10,13 @@ describe("input rules", () => {
     expect(validateInput("How can I prepare for an AI job market?", ["student", "employer", "educator", "ai", "customer"])).not.toBeNull());
   it("accepts valid input", () => expect(validateInput("How can I prepare for an AI job market?", ["student", "employer"])).toBeNull());
 });
+
+import { ROLES, resolveRole } from "@/lib/perspectives";
+describe("perspective options", () => {
+  it("offers 12 built-in perspectives", () => expect(ROLES.length).toBe(12));
+  it("accepts a typed custom perspective", () =>
+    expect(validateInput("How can I prepare for an AI job market?", ["student", "custom:Nurse"])).toBeNull());
+  it("rejects a custom perspective under 3 chars", () => expect(resolveRole("custom:ab")).toBeNull());
+  it("rejects duplicate perspectives", () =>
+    expect(validateInput("How can I prepare for an AI job market?", ["student", "student"])).not.toBeNull());
+});
