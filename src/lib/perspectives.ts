@@ -10,7 +10,7 @@ export const ROLES = [
   { id: "business", label: "Business Owner / Investor", focus: "return on investment, growth, competition and risk" },
   { id: "ethics", label: "Ethics / Legal Expert", focus: "rights, compliance, fairness and accountability" },
   { id: "community", label: "Community / Society", focus: "social impact, inclusion and shared benefit" },
-  { id: "critic", label: "Skeptic / Devil's Advocate", focus: "weak assumptions, hidden risks and what could go wrong" },
+  { id: "critic", label: "Risk & Assumptions Reviewer", focus: "weak assumptions, hidden risks and what could go wrong" },
 ] as const;
 
 export type RoleId = (typeof ROLES)[number]["id"];
