@@ -6,18 +6,16 @@ A user describes a situation, selects the people whose perspectives they would l
 
 ## Access
 
-- [Open the development preview](https://perspective-shift-playground.lovable.app/). Access may depend on the project's preview settings.
-- A published application link has not yet been added to this README.
+- [Live Application](https://perspective-shift-playground.lovable.app/) 
 - The project can also be opened in VS Code and run locally using the instructions below.
 
 ## How it works
 
 1. **Describe the problem.** Enter between 20 and 1,000 characters, excluding leading and trailing spaces.
-2. **Choose perspectives.** Select two to four of the six available roles: Student, Employer, University / Educator, Industry Professional, Customer / End User, and AI / Technology Specialist.
-   Before submission, the browser masks some recognisable sensitive details. If anything changes, the text that will be sent appears below the form for review. A reminder asks users to use made-up details and remove confidential information.
+2. **Choose perspectives.** Select 2 to 4 from 12 available roles. Before submission, the browser masks some recognisable sensitive details. If anything changes, the text that will be sent appears below the form for review. A reminder asks users to use made-up details and remove confidential information.
 3. **Review the perspectives.** Each role receives a card covering priorities, concerns, opportunities, and a suggested action. Thumbs-up and thumbs-down buttons let the user mark whether a card was helpful.
 4. **Compare and question.** The app presents similarities, differences, and three questions intended to challenge the user's assumptions.
-5. **Build a solution.** The user selects useful insights, optionally adds them to a draft, and writes their own solution.
+5. **Build a solution.** The user selects useful insights and can either write their own plan directly or click "Draft a solution from my insights" to have the AI combine the selections into a cohesive plan with numbered steps and trade-offs. The generated draft remains fully editable.
 6. **Reflect.** A summary brings together the original problem, perspectives explored, card ratings, selected insights, and final solution.
 
 The five views—Perspectives, Compare, Challenge, Build, and Reflect—can be revisited without making another AI request. The example button fills in a sample problem and four perspectives; it does not generate results until the user submits it.
