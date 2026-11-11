@@ -88,9 +88,9 @@ The same script names can be used with `npm run`.
 | `src/routes/index.tsx` | The main interface and five-step workflow, including inputs, role selection, retry, feedback, insights, draft, and reflection. Also defines the page title and description. |
 | `src/routes/__root.tsx` | Shared page structure, fonts, stylesheet, query provider, and missing-page and error displays. |
 | `src/routes/README.md` | Notes on the project's file-based routing conventions. |
-| `src/lib/perspectives.ts` | Role names and focus areas, shared input limits, input validation, and result types. |
+| `src/lib/perspectives.ts` | Role names and focus areas, shared input limits, custom user typed perspectives, input validation, and result types. |
 | `src/lib/privacy.ts` | Browser-side pattern matching that replaces some sensitive details before submission or retry. |
-| `src/lib/perspectives.functions.ts` | Server-side validation, prompt, JSON schema, Gemini request, response handling, and AI error messages. |
+| `src/lib/perspectives.functions.ts` | Server functions that call Gemini 3.1 Flash Lite to generate perspectives, validate, handle erros, and draft solutions |
 | `src/router.tsx` | Creates the router and a separate query client for each server request. |
 | `src/routeTree.gen.ts` | Generated route list; maintained by the routing tools rather than edited manually. |
 | `src/start.ts` | Request middleware, including server error handling and protection against cross-site server-function requests. |
@@ -172,7 +172,7 @@ Folders such as `node_modules`, `dist`, and `.output` are installed dependencies
 - **Gemini is not unlimited or inherently free here.** Requests use Lovable AI Gateway credits and require available workspace allowance or balance. This implementation does not use Google AI Studio's free tier or a daily-reset token quota. Selecting a lighter model does not restore exhausted credits.
 - **Response time varies.** Generation requires an internet connection and depends on service availability and request length. No fixed latency or uptime guarantee has been established for this prototype.
 - **Retry is limited.** The interface retains one automatic retry after a thrown connection error and a manual Retry button for valid submissions that fail. It does not switch to a fallback model. A lost response can leave a request's outcome uncertain, so retrying can result in another billed request.
-- **The workflow has fixed limits.** It accepts text only, with six predefined roles and two to four selections. It does not accept uploaded documents, custom roles, or follow-up conversations.
+- **The workflow has fixed limits.** It accepts text only, with 12 predefined roles or custom typed roles (selecting 2 to 4). It does not accept uploaded documents or follow-up chat conversations.
 - **A production deployment needs further review.** The app has no user accounts or application-level per-user spending limits. Automated tests cover specific behaviours, not every possible model answer, security risk, or hosting condition.
 
 
