@@ -4,6 +4,9 @@ PerspectiveShift AI is a prototype that helps people consider a problem from dif
 
 A user describes a situation, selects the people whose perspectives they would like to explore, and reviews the AI's suggestions. They can compare those viewpoints, question their assumptions, and write a response in their own words.
 
+<img width="1046" height="986" alt="image" src="https://github.com/user-attachments/assets/308f84a2-61ce-488a-a384-e90d6ea82fb9" />
+
+
 ## Access
 
 - [Live Application](https://perspective-shift-playground.lovable.app/) 
