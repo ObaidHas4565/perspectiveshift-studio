@@ -5,4 +5,5 @@
 - [x] Run the relevant tests and check the live generation flow.
 - [x] Add browser-side masking and a pre-submit privacy reminder.
 - [x] Document data handling, masking coverage, and limitations in the README.
-- [x] Test masking rules and verify the outgoing request in the interface.
+- [x] Test masking rules and verify the outgoing request in the interface.- [ ] Turn selected insights into a written solution instead of copying them.
+- [ ] Add more perspectives and allow typed custom perspectives.
