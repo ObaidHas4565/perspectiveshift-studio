@@ -42,6 +42,7 @@ function Index() {
   const [step, setStep] = useState(0);
   const [insights, setInsights] = useState<string[]>([]);
   const [solution, setSolution] = useState("");
+  const [notes, setNotes] = useState("");
   const [feedback, setFeedback] = useState<Record<string, "up" | "down">>({});
   const maskedProblem = maskSensitiveText(problem);
   const hasMaskedDetails = maskedProblem !== problem;
@@ -95,7 +96,7 @@ function Index() {
     setDrafting(true);
     setDraftError(null);
     try {
-      const res = await synth({ data: { problem: maskedProblem, insights: insights.slice(0, MAX_INSIGHTS), notes: maskSensitiveText(solution) } });
+      const res = await synth({ data: { problem: maskedProblem, insights: insights.slice(0, MAX_INSIGHTS), notes: maskSensitiveText(notes) } });
       if (!res.ok) return setDraftError(res.error);
       setSolution(res.solution);
     } catch {
@@ -290,14 +291,17 @@ function Index() {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Your solution</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Optionally jot your own thoughts below, then let the AI weave your selected insights into one plan. Edit it until it's yours.</p>
+                <p className="mt-1 text-sm text-muted-foreground">Optionally add your own thoughts, then let the AI weave your selected insights into one plan. Edit the plan until it's yours.</p>
+                <label htmlFor="notes" className="mt-3 block text-sm font-medium text-foreground">Your thoughts (optional)</label>
+                <Textarea id="notes" value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} className="mt-1 min-h-20" placeholder="Anything the plan should consider…" />
                 <Button variant="outline" size="sm" className="mt-3" disabled={!insights.length || drafting}
                   onClick={draftSolution}>
-                  {drafting ? "Drafting…" : solution.trim() ? "Redraft using my notes + insights" : "Draft a solution from my insights"}
+                  {drafting ? "Drafting…" : solution.trim() ? "Redraft from my thoughts + insights" : "Draft a solution from my insights"}
                 </Button>
                 {insights.length > MAX_INSIGHTS && <p className="mt-2 text-xs text-muted-foreground">Only the first {MAX_INSIGHTS} insights will be used.</p>}
                 {draftError && <p role="alert" className="mt-2 text-sm text-destructive">{draftError}</p>}
-                <Textarea value={solution} onChange={(e) => setSolution(e.target.value)} className="mt-3 min-h-64" placeholder="Write your final solution…" />
+                <label htmlFor="final-plan" className="mt-3 block text-sm font-medium text-foreground">Final solution</label>
+                <Textarea id="final-plan" value={solution} onChange={(e) => setSolution(e.target.value)} className="mt-1 min-h-64" placeholder="Draft with AI above, or write your final solution…" />
                 <div className="mt-3"><PlanActions solution={solution} /></div>
                 <Button className="mt-3 w-full" disabled={!solution.trim()} onClick={() => setStep(4)}>See reflection summary</Button>
               </div>
@@ -307,7 +311,13 @@ function Index() {
           {step === 4 && (
             <div className="space-y-4 rounded-2xl border bg-card p-8 shadow-soft">
               <h2 className="text-3xl font-bold text-foreground">Reflection summary</h2>
-              <PlanActions solution={solution} />
+              <PlanActions solution={[
+                "PerspectiveShift reflection summary", "",
+                "Original problem", problem.trim(), "",
+                "Perspectives explored", result.perspectives.map((p) => p.role + (feedback[p.role] ? (feedback[p.role] === "up" ? " (helpful)" : " (not helpful)") : "")).join(", "), "",
+                "Selected insights", ...(insights.length ? insights.map((i) => "- " + i) : ["None selected."]), "",
+                "Your final solution", solution.trim() || "Not written yet.",
+              ].join("\n")} />
               <Block title="Original problem"><p>{problem}</p></Block>
               <Block title="Perspectives explored"><p>{result.perspectives.map((p) => p.role + (feedback[p.role] ? (feedback[p.role] === "up" ? " 👍" : " 👎") : "")).join(", ")}</p></Block>
               <Block title="Selected insights">
