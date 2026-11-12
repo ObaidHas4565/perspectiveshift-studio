@@ -7,7 +7,7 @@
 - [x] Document data handling, masking coverage, and limitations in the README.
 - [x] Test masking rules and verify the outgoing request in the interface.- [x] Turn selected insights into a written solution instead of copying them.
 - [x] Add more perspectives and allow typed custom perspectives.
-- [ ] Add local final-plan copy/download and a Build-step insight count.
-- [ ] Add prompt-injection instructions to both AI operations and test their request boundaries.
+- [x] Add local final-plan copy/download and a Build-step insight count.
+- [x] Add prompt-injection instructions to both AI operations and test their request boundaries.
 - [x] Confirm allowance reset and publishing requirements without changing providers or hosting.
-- [ ] Run tests and verify the updated flow in the browser.
+- [x] Run tests and verify the updated flow in the browser.

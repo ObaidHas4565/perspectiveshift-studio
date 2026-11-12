@@ -9,7 +9,7 @@ describe("local plan export", () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
     const fetchSpy = vi.spyOn(globalThis, "fetch");
-    render(<PlanActions solution="1. Compare options.\n2. Try one approach." />);
+    render(<PlanActions solution={"1. Compare options.\n2. Try one approach."} />);
     fireEvent.click(screen.getByRole("button", { name: "Copy plan" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith("1. Compare options.\n2. Try one approach."));
     expect(fetchSpy).not.toHaveBeenCalled();
