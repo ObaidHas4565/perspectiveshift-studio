@@ -10,7 +10,7 @@ describe("local plan export", () => {
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
     const fetchSpy = vi.spyOn(globalThis, "fetch");
     render(<PlanActions solution="1. Compare options.\n2. Try one approach." />);
-    fireEvent.click(screen.get_by_role ? document.body : screen.getByRole("button", { name: "Copy plan" }));
+    fireEvent.click(screen.getByRole("button", { name: "Copy plan" }));
     await waitFor(() => expect(writeText).toHaveBeenCalledWith("1. Compare options.\n2. Try one approach."));
     expect(fetchSpy).not.toHaveBeenCalled();
   });
