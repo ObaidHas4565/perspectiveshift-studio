@@ -9,6 +9,7 @@ import {
 } from "@/lib/perspectives";
 import { generatePerspectives, synthesizeSolution } from "@/lib/perspectives.functions";
 import { maskSensitiveText } from "@/lib/privacy";
+import { PlanActions } from "@/components/plan-actions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -275,6 +276,9 @@ function Index() {
             <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <h2 className="text-2xl font-bold text-foreground">Pick useful insights</h2>
+                <p role="status" className="mt-2 text-sm text-muted-foreground">
+                  {insights.length} {insights.length === 1 ? "insight" : "insights"} selected
+                </p>
                 <div className="mt-4 space-y-2">
                   {result.perspectives.flatMap((p) => [p.priorities, p.opportunities, p.action].map((t) => ({ t, role: p.role }))).map(({ t, role }) => (
                     <label key={role + t} className="flex cursor-pointer gap-3 rounded-xl border bg-card p-3 text-sm">
@@ -294,6 +298,7 @@ function Index() {
                 {insights.length > MAX_INSIGHTS && <p className="mt-2 text-xs text-muted-foreground">Only the first {MAX_INSIGHTS} insights will be used.</p>}
                 {draftError && <p role="alert" className="mt-2 text-sm text-destructive">{draftError}</p>}
                 <Textarea value={solution} onChange={(e) => setSolution(e.target.value)} className="mt-3 min-h-64" placeholder="Write your final solution…" />
+                <div className="mt-3"><PlanActions solution={solution} /></div>
                 <Button className="mt-3 w-full" disabled={!solution.trim()} onClick={() => setStep(4)}>See reflection summary</Button>
               </div>
             </div>
@@ -302,6 +307,7 @@ function Index() {
           {step === 4 && (
             <div className="space-y-4 rounded-2xl border bg-card p-8 shadow-soft">
               <h2 className="text-3xl font-bold text-foreground">Reflection summary</h2>
+              <PlanActions solution={solution} />
               <Block title="Original problem"><p>{problem}</p></Block>
               <Block title="Perspectives explored"><p>{result.perspectives.map((p) => p.role + (feedback[p.role] ? (feedback[p.role] === "up" ? " 👍" : " 👎") : "")).join(", ")}</p></Block>
               <Block title="Selected insights">
