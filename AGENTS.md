@@ -33,3 +33,5 @@ use the editor.
 - Input rules (lengths, role counts) live in src/lib/perspectives.ts and are enforced both in the UI and the server function, so they can never drift apart.
 - AI calls run only in src/lib/perspectives.functions.ts via the Lovable AI Gateway SDK with a strict JSON schema, keeping the key server-side.
 - Mask problem text in the browser with src/lib/privacy.ts before every generation or retry; keep originals in page state only, so detected identifiers never enter the application request.
+- Final-plan copying and plain-text downloads run only in the browser through PlanActions, so exporting adds no server requests or AI calls.
+- Both AI operations treat problem text, custom labels, insights and notes as untrusted data in their system instructions; this reduces prompt-override risk without claiming immunity.
