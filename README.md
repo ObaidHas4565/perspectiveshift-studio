@@ -3,7 +3,10 @@
 PerspectiveShift AI is a prototype that helps people consider a problem from different viewpoints before forming their own solution. It is intended to support critical thinking, rather than provide a single answer to follow.
 
 A user describes a situation, selects the people whose perspectives they would like to explore, and reviews the AI's suggestions. They can compare those viewpoints, question their assumptions, and write a response in their own words.
+### 1. Problem Input & Perspective Selection
 <img width="1046" height="1086" alt="image" src="https://github.com/user-attachments/assets/2a555ef7-7ec1-423d-b456-57f87d048be6" />
+
+### 2. Synthesized Solution & Reflection
 <img width="1046" height="1086" alt="image" src="https://github.com/user-attachments/assets/70d4ac40-e194-4680-99d5-fe1a752f86a2" />
 
 ## Access
