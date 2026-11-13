@@ -1,7 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { validateInput } from "@/lib/perspectives";
+import { problemChars, validateInput } from "@/lib/perspectives";
 
 describe("input rules", () => {
+  it("counts spaces toward the limit so the counter matches where typing stops", () =>
+    expect(problemChars("a".repeat(999) + " ")).toBe(1000));
   it("rejects empty problem", () => expect(validateInput("  ", ["student", "employer"])).not.toBeNull());
   it("rejects problem under 20 chars", () => expect(validateInput("too short", ["student", "employer"])).not.toBeNull());
   it("rejects over 1000 chars", () => expect(validateInput("a".repeat(1001), ["student", "employer"])).not.toBeNull());
