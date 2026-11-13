@@ -35,6 +35,15 @@ export function resolveRole(id: string): { label: string; focus: string } | null
   return { label, focus: "the responsibilities and interests typical of this role" };
 }
 
+/**
+ * Characters counted against PROBLEM_MAX while typing: everything the text box
+ * holds, including spaces, so the on-screen count always matches the point where
+ * typing stops.
+ */
+export function problemChars(value: string): number {
+  return value.length;
+}
+
 export function validateInput(problem: string, roles: string[]): string | null {
   const p = problem.trim();
   if (!p) return "Please describe your problem or situation.";

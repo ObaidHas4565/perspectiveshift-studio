@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ROLES, MAX_ROLES, MIN_ROLES, PROBLEM_MAX, CUSTOM_PREFIX, CUSTOM_ROLE_MAX, MAX_INSIGHTS,
-  resolveRole, validateInput, type Analysis,
+  problemChars, resolveRole, validateInput, type Analysis,
 } from "@/lib/perspectives";
 import { generatePerspectives, synthesizeSolution } from "@/lib/perspectives.functions";
 import { maskSensitiveText } from "@/lib/privacy";
@@ -143,7 +143,7 @@ function Index() {
               <button type="button" className="underline-offset-2 hover:underline" onClick={() => { setProblem(EXAMPLE); setRoles(["student", "employer", "educator", "ai"]); }}>
                 Try the example
               </button>
-              <span>{problem.trim().length}/{PROBLEM_MAX}</span>
+              <span>{problemChars(problem)}/{PROBLEM_MAX}</span>
             </div>
 
             <p className="mt-6 text-sm font-semibold text-foreground">
