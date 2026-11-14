@@ -13,7 +13,7 @@ describe("input rules", () => {
   it("accepts valid input", () => expect(validateInput("How can I prepare for an AI job market?", ["student", "employer"])).toBeNull());
 });
 
-import { ROLES, resolveRole } from "@/lib/perspectives";
+import { ROLES, resolveRole, validateCustomPerspective } from "@/lib/perspectives";
 describe("perspective options", () => {
   it("offers 12 built-in perspectives", () => expect(ROLES.length).toBe(12));
   it("accepts a typed custom perspective", () =>
@@ -21,4 +21,15 @@ describe("perspective options", () => {
   it("rejects a custom perspective under 3 chars", () => expect(resolveRole("custom:ab")).toBeNull());
   it("rejects duplicate perspectives", () =>
     expect(validateInput("How can I prepare for an AI job market?", ["student", "student"])).not.toBeNull());
+  it.each(["fdg", "ffd", "fgd", "Nurse fdg", "asdf qwerty"])("rejects meaningless custom label %s", (label) => {
+    expect(validateCustomPerspective(label)).not.toBeNull();
+    expect(validateInput("How can I prepare for an AI job market?", ["student", `custom:${label}`])).not.toBeNull();
+  });
+  it.each(["freak", "weirdo", "FREAK", "a weirdo", "Store freak", "idiot"])("rejects insulting custom label %s", (label) => {
+    expect(validateCustomPerspective(label)).not.toBeNull();
+    expect(resolveRole(`custom:${label}`)).toBeNull();
+  });
+  it.each(["Nurse", "Store Cashier", "Elderly Shopper", "Accessibility Advocate", "Startup Founder", "AI Specialist", "UX Designer", "Landlord", "Risk Reviewer"])("accepts meaningful custom label %s", (label) => {
+    expect(validateCustomPerspective(label)).toBeNull();
+  });
 });
