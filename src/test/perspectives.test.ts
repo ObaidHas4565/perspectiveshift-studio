@@ -21,6 +21,13 @@ describe("perspective options", () => {
   it("rejects a custom perspective under 3 chars", () => expect(resolveRole("custom:ab")).toBeNull());
   it("rejects duplicate perspectives", () =>
     expect(validateInput("How can I prepare for an AI job market?", ["student", "student"])).not.toBeNull());
+  it.each(ROLES.map((role) => role.label))("rejects preset name %s as a custom perspective even when unselected", (label) => {
+    expect(validateCustomPerspective(label)).not.toBeNull();
+    expect(validateInput("How can I prepare for an AI job market?", ["student", `custom:${label}`])).not.toBeNull();
+  });
+  it.each(["student", " STUDENT ", "Industry   Professional", "Educator", "University", "End User", "AI", "Parent", "Policymaker", "University/Educator"])("rejects preset spelling or listed alternative %s", (label) => {
+    expect(validateCustomPerspective(label)).not.toBeNull();
+  });
   it.each(["fdg", "ffd", "fgd", "Nurse fdg", "asdf qwerty"])("rejects meaningless custom label %s", (label) => {
     expect(validateCustomPerspective(label)).not.toBeNull();
     expect(validateInput("How can I prepare for an AI job market?", ["student", `custom:${label}`])).not.toBeNull();
