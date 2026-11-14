@@ -112,7 +112,20 @@ function Index() {
   const toggleInsight = (t: string) =>
     setInsights((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
 
-  const reset = () => { setResult(null); setStep(0); };
+  const reset = () => {
+    setProblem("");
+    setRoles([]);
+    setCustomRole("");
+    setResult(null);
+    setStep(0);
+    setInsights([]);
+    setNotes("");
+    setSolution("");
+    setFeedback({});
+    setError(null);
+    setCustomRoleError(null);
+    setDraftError(null);
+  };
 
   return (
     <main className="min-h-screen">
@@ -120,7 +133,7 @@ function Index() {
         <button onClick={reset} className="font-display text-xl font-bold text-foreground">
           Perspective<span className="text-primary">Shift</span> AI
         </button>
-        {result && <Button variant="outline" size="sm" onClick={reset}>New problem</Button>}
+        {result && <Button variant="outline" size="sm" onClick={reset} disabled={drafting}>New problem</Button>}
       </header>
 
       {!result ? (
