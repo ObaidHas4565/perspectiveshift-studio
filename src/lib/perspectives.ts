@@ -1,3 +1,9 @@
+import commonWords from "wordlist-english/english-words-10.json";
+import everydayWords from "wordlist-english/english-words-20.json";
+import extendedWords from "wordlist-english/english-words-35.json";
+import specialistWords from "wordlist-english/english-words-40.json";
+import additionalWords from "wordlist-english/english-words-50.json";
+
 export const ROLES = [
   { id: "student", label: "Student", focus: "learning, career growth, cost and time" },
   { id: "employer", label: "Employer", focus: "hiring, productivity, team capability and risk" },
@@ -25,13 +31,39 @@ export const CUSTOM_ROLE_MIN = 3;
 export const CUSTOM_ROLE_MAX = 40;
 export const MAX_INSIGHTS = 12;
 
+const perspectiveWords = new Set([
+  ...commonWords, ...everydayWords, ...extendedWords, ...specialistWords, ...additionalWords,
+  "ai", "it", "hr", "ux", "ui", "ceo", "cto", "cfo", "coo", "ciso", "ngo", "stem", "lgbtq", "devops", "startup", "cybersecurity",
+].map((word) => word.toLowerCase()));
+const insultingWords = new Set([
+  "freak", "freaks", "weirdo", "weirdos", "idiot", "idiots", "moron", "morons", "loser", "losers",
+  "stupid", "dumb", "creep", "creeps", "jerk", "jerks", "imbecile", "imbeciles",
+  "fuck", "fucking", "shit", "asshole", "bitch", "bastard",
+]);
+
+/** Local checks are deliberately conservative, not a claim of semantic understanding. */
+export function validateCustomPerspective(label: string): string | null {
+  const value = label.trim();
+  if (value.length < CUSTOM_ROLE_MIN || value.length > CUSTOM_ROLE_MAX) {
+    return `Custom perspectives must be ${CUSTOM_ROLE_MIN}–${CUSTOM_ROLE_MAX} characters.`;
+  }
+  const words = value.toLowerCase().split(/[\s/&()'’.-]+/).filter(Boolean);
+  if (words.some((word) => insultingWords.has(word))) {
+    return "Please use a respectful perspective name, without insulting labels.";
+  }
+  if (!/^[a-z\s/&()'’.-]+$/i.test(value) || !words.length || words.some((word) => !perspectiveWords.has(word))) {
+    return "Use a recognizable perspective name, such as Nurse or Store Cashier. Check the spelling.";
+  }
+  return null;
+}
+
 /** Role ids are either a built-in id or "custom:<label>" typed by the user. */
 export function resolveRole(id: string): { label: string; focus: string } | null {
   const known = ROLES.find((r) => r.id === id);
   if (known) return known;
   if (!id.startsWith(CUSTOM_PREFIX)) return null;
   const label = id.slice(CUSTOM_PREFIX.length).trim();
-  if (label.length < CUSTOM_ROLE_MIN || label.length > CUSTOM_ROLE_MAX) return null;
+  if (validateCustomPerspective(label)) return null;
   return { label, focus: "the responsibilities and interests typical of this role" };
 }
 
@@ -52,7 +84,12 @@ export function validateInput(problem: string, roles: string[]): string | null {
   if (roles.length < MIN_ROLES) return `Select at least ${MIN_ROLES} perspectives.`;
   if (roles.length > MAX_ROLES) return `Select no more than ${MAX_ROLES} perspectives.`;
   if (new Set(roles.map((r) => r.toLowerCase())).size !== roles.length) return "Each perspective can only be selected once.";
-  if (roles.some((r) => !resolveRole(r))) return `Custom perspectives must be ${CUSTOM_ROLE_MIN}–${CUSTOM_ROLE_MAX} characters.`;
+  for (const role of roles) {
+    if (role.startsWith(CUSTOM_PREFIX)) {
+      const error = validateCustomPerspective(role.slice(CUSTOM_PREFIX.length));
+      if (error) return error;
+    } else if (!resolveRole(role)) return "Please select a valid perspective.";
+  }
   return null;
 }
 

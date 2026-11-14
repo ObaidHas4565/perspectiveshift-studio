@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ROLES, MAX_ROLES, MIN_ROLES, PROBLEM_MAX, CUSTOM_PREFIX, CUSTOM_ROLE_MAX, MAX_INSIGHTS,
-  problemChars, resolveRole, validateInput, type Analysis,
+  problemChars, resolveRole, validateInput, validateCustomPerspective, type Analysis,
 } from "@/lib/perspectives";
 import { generatePerspectives, synthesizeSolution } from "@/lib/perspectives.functions";
 import { maskSensitiveText } from "@/lib/privacy";
@@ -32,6 +32,7 @@ function Index() {
   const gen = useServerFn(generatePerspectives);
   const synth = useServerFn(synthesizeSolution);
   const [customRole, setCustomRole] = useState("");
+  const [customRoleError, setCustomRoleError] = useState<string | null>(null);
   const [drafting, setDrafting] = useState(false);
   const [draftError, setDraftError] = useState<string | null>(null);
   const [problem, setProblem] = useState("");
@@ -84,9 +85,11 @@ function Index() {
     const label = maskSensitiveText(customRole.trim().replace(/\s+/g, " "));
     if (!label) return;
     const id = CUSTOM_PREFIX + label;
-    if (!resolveRole(id)) return setError("Custom perspectives must be 3–40 characters.");
-    if (roles.some((x) => resolveRole(x)?.label.toLowerCase() === label.toLowerCase())) return setError("That perspective is already selected.");
-    if (roles.length >= MAX_ROLES) return setError(`Select no more than ${MAX_ROLES} perspectives.`);
+    const customError = validateCustomPerspective(label);
+    if (customError) return setCustomRoleError(customError);
+    if (roles.some((x) => resolveRole(x)?.label.toLowerCase() === label.toLowerCase())) return setCustomRoleError("That perspective is already selected.");
+    if (roles.length >= MAX_ROLES) return setCustomRoleError(`Select no more than ${MAX_ROLES} perspectives.`);
+    setCustomRoleError(null);
     setError(null);
     setRoles((r) => [...r, id]);
     setCustomRole("");
@@ -177,14 +180,17 @@ function Index() {
               <input
                 value={customRole}
                 maxLength={CUSTOM_ROLE_MAX}
-                onChange={(e) => setCustomRole(e.target.value)}
+                onChange={(e) => { setCustomRole(e.target.value); setCustomRoleError(null); }}
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomRole(); } }}
                 placeholder="Or type your own, e.g. Nurse, Landlord, Startup Founder"
                 aria-label="Custom perspective"
+                aria-invalid={Boolean(customRoleError)}
+                aria-describedby={customRoleError ? "custom-perspective-error" : undefined}
                 className="flex-1 rounded-xl border bg-background px-4 py-2 text-sm text-foreground"
               />
               <Button type="button" variant="outline" onClick={addCustomRole} disabled={!customRole.trim() || roles.length >= MAX_ROLES}>Add</Button>
             </div>
+            {customRoleError && <p id="custom-perspective-error" role="alert" className="mt-2 text-sm text-destructive">{customRoleError}</p>}
 
             {error && (
               <div role="alert" className="mt-4 flex items-center justify-between gap-3 rounded-lg bg-destructive/10 px-4 py-2 text-sm text-destructive">

@@ -21,6 +21,14 @@ import { generatePerspectives, synthesizeSolution } from "@/lib/perspectives.fun
 describe("perspective model integration", () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it.each(["fdg", "ffd", "freak", "weirdo"])("rejects custom label %s before any AI call", async (label) => {
+    const response = await generatePerspectives({
+      data: { problem: "How can I prepare for an AI-driven job market?", roles: ["student", `custom:${label}`] },
+    });
+    expect(response.ok).toBe(false);
+    expect(generateChatCompletion).not.toHaveBeenCalled();
+  });
+
   it("uses Gemini 3.1 Flash Lite and maps its structured response", async () => {
     const result = {
       perspectives: ["Student", "Employer"].map((role) => ({
