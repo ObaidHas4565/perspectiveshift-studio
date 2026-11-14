@@ -1,5 +1,7 @@
 # Tasks
 
+- [x] Make New problem clear the previous inputs, perspectives, workspace and warnings; add reset regression tests.
+
 - [x] Keep Retry out of custom-perspective validation warnings.
 - [x] Reject meaningless or insulting custom labels locally and on generation; test both rules.
 
