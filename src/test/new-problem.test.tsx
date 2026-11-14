@@ -31,6 +31,22 @@ async function startProblem() {
 }
 
 describe("New problem", () => {
+  it("rejects Student in the Add field before or after selecting the preset without generating", () => {
+    const Page = Route.options.component;
+    if (!Page) throw new Error("Missing index component");
+    render(<Page />);
+    fireEvent.change(screen.getByLabelText("Custom perspective"), { target: { value: "student" } });
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("already available above");
+    expect(screen.getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(screen.getByRole("button", { name: "Student" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("already available above");
+    expect(screen.getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByRole("button", { name: "Retry" })).not.toBeInTheDocument();
+    expect(generate).not.toHaveBeenCalled();
+  });
+
   it("clears the problem, preset and custom perspectives, and custom warning", async () => {
     await startProblem();
     fireEvent.click(screen.getByRole("button", { name: "New problem" }));

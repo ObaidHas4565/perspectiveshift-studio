@@ -43,7 +43,13 @@ const insultingWords = new Set([
 
 /** Local checks are deliberately conservative, not a claim of semantic understanding. */
 export function validateCustomPerspective(label: string): string | null {
-  const value = label.trim();
+  const value = label.trim().replace(/\s+/g, " ");
+  const normalized = value.toLowerCase().replace(/\s*\/\s*/g, "/");
+  const preset = ROLES.find((role) => {
+    const name = role.label.toLowerCase().replace(/\s*\/\s*/g, "/");
+    return name === normalized || name.split("/").some((part) => part.trim() === normalized);
+  });
+  if (preset) return `That perspective is already available above. Select "${preset.label}" instead.`;
   if (value.length < CUSTOM_ROLE_MIN || value.length > CUSTOM_ROLE_MAX) {
     return `Custom perspectives must be ${CUSTOM_ROLE_MIN}–${CUSTOM_ROLE_MAX} characters.`;
   }

@@ -1,5 +1,7 @@
 # Tasks
 
+- [x] Reject preset names in custom perspectives, including case/spacing variations and listed alternatives; test before and after preset selection.
+
 - [x] Make New problem clear the previous inputs, perspectives, workspace and warnings; add reset regression tests.
 
 - [x] Keep Retry out of custom-perspective validation warnings.
