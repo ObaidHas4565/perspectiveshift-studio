@@ -21,11 +21,11 @@ async function startProblem() {
   if (!Page) throw new Error("Missing index component");
   render(<Page />);
   fireEvent.change(screen.getByLabelText("Describe your problem or situation"), { target: { value: "How can I prepare for a changing job market?" } });
-  fireEvent.click(screen.getByRole("button", { name: "Student", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Student" }));
   fireEvent.change(screen.getByLabelText("Custom perspective"), { target: { value: "Nurse" } });
-  fireEvent.click(screen.getByRole("button", { name: "Add", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Add" }));
   fireEvent.change(screen.getByLabelText("Custom perspective"), { target: { value: "fgd" } });
-  fireEvent.click(screen.getByRole("button", { name: "Add", exact: true }));
+  fireEvent.click(screen.getByRole("button", { name: "Add" }));
   fireEvent.click(screen.getByRole("button", { name: "Generate Perspectives" }));
   await screen.findByRole("button", { name: "New problem" });
 }
@@ -36,7 +36,7 @@ describe("New problem", () => {
     fireEvent.click(screen.getByRole("button", { name: "New problem" }));
     expect(screen.getByLabelText("Describe your problem or situation")).toHaveValue("");
     expect(screen.getByLabelText("Custom perspective")).toHaveValue("");
-    expect(screen.getByRole("button", { name: "Student", exact: true })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("button", { name: /Nurse/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Generate Perspectives" }));
@@ -46,9 +46,11 @@ describe("New problem", () => {
 
   it("clears notes, selected insights, final solution and feedback before another problem", async () => {
     await startProblem();
-    fireEvent.click(screen.getByRole("button", { name: "Helpful", exact: true }));
+    fireEvent.click(screen.getByRole("button", { name: "Helpful" }));
     fireEvent.click(screen.getByRole("button", { name: "4. Build" }));
-    fireEvent.click(screen.getAllByRole("checkbox")[0]);
+    const insight = screen.getAllByRole("checkbox").at(0);
+    if (!insight) throw new Error("Missing selectable insight");
+    fireEvent.click(insight);
     fireEvent.change(screen.getByLabelText("Your thoughts (optional)"), { target: { value: "Keep the course affordable." } });
     fireEvent.click(screen.getByRole("button", { name: "Draft a solution from my insights" }));
     await waitFor(() => expect(screen.getByLabelText("Final solution")).toHaveValue("Try a short course and review your progress."));
@@ -56,11 +58,11 @@ describe("New problem", () => {
     fireEvent.click(screen.getByRole("button", { name: "Try the example" }));
     fireEvent.click(screen.getByRole("button", { name: "Generate Perspectives" }));
     await screen.findByRole("button", { name: "New problem" });
-    expect(screen.getByRole("button", { name: "Helpful", exact: true })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Helpful" })).toHaveAttribute("aria-pressed", "false");
     fireEvent.click(screen.getByRole("button", { name: "4. Build" }));
     expect(screen.getByLabelText("Your thoughts (optional)")).toHaveValue("");
     expect(screen.getByLabelText("Final solution")).toHaveValue("");
-    expect(screen.getByRole("status")).toHaveTextContent("0 insights selected");
+    expect(screen.getByText("0 insights selected")).toBeInTheDocument();
     expect(screen.getAllByRole("checkbox")[0]).not.toBeChecked();
   });
 });
