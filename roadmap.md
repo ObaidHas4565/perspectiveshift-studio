@@ -1,5 +1,7 @@
 # Tasks
 
+- [ ] Add preset perspective search, restore all 12 when cleared, and verify filtering and selection preservation.
+
 - [x] Reject preset names in custom perspectives, including case/spacing variations and listed alternatives; test before and after preset selection.
 
 - [x] Make New problem clear the previous inputs, perspectives, workspace and warnings; add reset regression tests.

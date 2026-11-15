@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { Search, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,6 +38,8 @@ function Index() {
   const [draftError, setDraftError] = useState<string | null>(null);
   const [problem, setProblem] = useState("");
   const [roles, setRoles] = useState<string[]>([]);
+  const [perspectiveSearch, setPerspectiveSearch] = useState("");
+  const filteredRoles = ROLES.filter((role) => role.label.toLowerCase().includes(perspectiveSearch.trim().toLowerCase()));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Analysis | null>(null);
@@ -115,6 +118,7 @@ function Index() {
   const reset = () => {
     setProblem("");
     setRoles([]);
+    setPerspectiveSearch("");
     setCustomRole("");
     setResult(null);
     setStep(0);
@@ -165,8 +169,26 @@ function Index() {
             <p className="mt-6 text-sm font-semibold text-foreground">
               Choose {MIN_ROLES}–{MAX_ROLES} perspectives <span className="font-normal text-muted-foreground">({roles.length} selected)</span>
             </p>
+            <div className="relative mt-3">
+              <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground" />
+              <input
+                type="search"
+                aria-label="Search preset perspectives"
+                value={perspectiveSearch}
+                onChange={(event) => setPerspectiveSearch(event.target.value)}
+                placeholder="Search preset perspectives"
+                className="w-full rounded-xl border bg-background py-2 pl-10 pr-12 text-sm text-foreground"
+              />
+              {perspectiveSearch && (
+                <Button type="button" variant="ghost" size="icon" aria-label="Clear perspective search" title="Clear perspective search"
+                  className="absolute right-1 top-1 size-8" onClick={() => setPerspectiveSearch("")}>
+                  <X aria-hidden="true" className="size-4" />
+                </Button>
+              )}
+            </div>
+            {filteredRoles.length === 0 && <p role="status" className="mt-3 text-sm text-muted-foreground">No preset perspectives found.</p>}
             <div className="mt-3 grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-              {ROLES.map((r) => {
+              {filteredRoles.map((r) => {
                 const on = roles.includes(r.id);
                 const disabled = !on && roles.length >= MAX_ROLES;
                 return (

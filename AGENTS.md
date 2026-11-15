@@ -30,6 +30,7 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Project rules
+- Preset perspective search filters labels locally without changing selections or making AI requests, and New problem clears the query so the full catalog returns.
 - Custom-label checks use static word-list JSON imports and a local insult filter through shared validation; never import the package's filesystem-based entry point or add AI calls for label checks.
 - Custom-perspective warnings have separate page state from generation errors, so adding an invalid label cannot offer a generation retry.
 - Input rules (lengths, role counts) live in src/lib/perspectives.ts and are enforced both in the UI and the server function, so they can never drift apart.
