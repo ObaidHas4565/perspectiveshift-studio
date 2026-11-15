@@ -25,6 +25,7 @@ async function startProblem() {
   fireEvent.change(screen.getByLabelText("Custom perspective"), { target: { value: "Nurse" } });
   fireEvent.click(screen.getByRole("button", { name: "Add" }));
   fireEvent.change(screen.getByLabelText("Custom perspective"), { target: { value: "fgd" } });
+  fireEvent.change(screen.getByRole("searchbox", { name: "Search preset perspectives" }), { target: { value: "Student" } });
   fireEvent.click(screen.getByRole("button", { name: "Add" }));
   fireEvent.click(screen.getByRole("button", { name: "Generate Perspectives" }));
   await screen.findByRole("button", { name: "New problem" });
@@ -52,6 +53,8 @@ describe("New problem", () => {
     fireEvent.click(screen.getByRole("button", { name: "New problem" }));
     expect(screen.getByLabelText("Describe your problem or situation")).toHaveValue("");
     expect(screen.getByLabelText("Custom perspective")).toHaveValue("");
+    expect(screen.getByRole("searchbox", { name: "Search preset perspectives" })).toHaveValue("");
+    expect(screen.getByRole("button", { name: "Employer" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Student" })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("button", { name: /Nurse/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
